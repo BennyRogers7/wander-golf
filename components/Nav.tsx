@@ -25,7 +25,7 @@ export default function Nav() {
           letterSpacing: '0.25em',
         }}
       >
-        Wander
+        Wander Golf
       </Link>
     </header>
   )

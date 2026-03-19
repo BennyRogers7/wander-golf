@@ -170,11 +170,13 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
               <h2 className="text-xl font-[family-name:var(--font-serif)] font-normal text-[#1a3a2a] mb-4">
                 At a Glance
               </h2>
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
+              <div className="grid grid-cols-4 md:grid-cols-8 gap-4 text-center">
+                <Stat label="Holes" value={(primaryCourse?.numberOfHoles || 18).toString()} />
                 <Stat label="Par" value={par.toString()} />
                 <Stat label="Yardage" value={yardage ? yardage.toLocaleString() : '—'} />
                 <Stat label="Slope" value={slope ? slope.toString() : '—'} />
                 <Stat label="Rating" value={rating ? rating.toFixed(1) : '—'} />
+                <Stat label="Price" value={club.priceRange || '—'} />
                 <Stat label="Walkable" value={club.walkable === true ? 'Yes' : club.walkable === false ? 'No' : '—'} />
                 <Stat label="Access" value={club.accessType || '—'} />
               </div>
