@@ -1,8 +1,10 @@
+import Link from 'next/link'
+
 const intents = [
-  { number: "01", text: "Find my next round" },
-  { number: "02", text: "I'm planning a golf trip" },
-  { number: "03", text: "I want to find courses worth traveling for" },
-  { number: "04", text: "Show me something I've never heard of" },
+  { number: "01", text: "Find my next round", href: "/courses" },
+  { number: "02", text: "I'm planning a golf trip", href: "/courses" },
+  { number: "03", text: "I want to find courses worth traveling for", href: "/courses" },
+  { number: "04", text: "Show me something I've never heard of", href: "/courses" },
 ]
 
 export default function HomePage() {
@@ -92,8 +94,9 @@ export default function HomePage() {
         {/* Intent List */}
         <div>
           {intents.map((intent) => (
-            <button
+            <Link
               key={intent.number}
+              href={intent.href}
               style={{
                 width: '100%',
                 display: 'flex',
@@ -103,10 +106,7 @@ export default function HomePage() {
                 borderBottom: '1px solid rgba(26, 58, 42, 0.08)',
                 cursor: 'pointer',
                 background: 'transparent',
-                border: 'none',
-                borderBottomStyle: 'solid',
-                borderBottomWidth: '1px',
-                borderBottomColor: 'rgba(26, 58, 42, 0.08)',
+                textDecoration: 'none',
                 transition: 'background-color 200ms',
               }}
               className="hover:bg-[#c9a84c]/[0.06]"
@@ -135,7 +135,7 @@ export default function HomePage() {
                 </span>
               </div>
               <span style={{ fontSize: '14px', color: '#c9a84c' }}>→</span>
-            </button>
+            </Link>
           ))}
         </div>
 
