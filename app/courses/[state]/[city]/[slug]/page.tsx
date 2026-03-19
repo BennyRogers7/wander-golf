@@ -92,8 +92,35 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
   const slope = primaryTee?.slopeRating || 0
   const rating = primaryTee?.courseRating || 0
 
+  // JSON-LD structured data for SEO
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'GolfCourse',
+    name: club.name,
+    description: club.metaDescription || club.writtenSummary || `${club.name} golf course in ${club.city}, ${club.state}`,
+    url: `https://wander.golf/courses/${state}/${city}/${slug}`,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: club.address || undefined,
+      addressLocality: club.city,
+      addressRegion: club.state,
+      addressCountry: 'US',
+    },
+    geo: club.latitude && club.longitude ? {
+      '@type': 'GeoCoordinates',
+      latitude: club.latitude,
+      longitude: club.longitude,
+    } : undefined,
+    telephone: club.phone || undefined,
+    image: club.photoUrl || 'https://wander.golf/images/hero-morning.png',
+  }
+
   return (
     <main className="min-h-screen bg-[#f8f5ef]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* 1. Hero */}
       <header className="relative text-white" style={{ height: '400px' }}>
         {/* Background Image */}
