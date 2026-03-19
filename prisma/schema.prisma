@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Club {
+  id          String   @id @default(cuid())
+  apiId       Int      @unique
+  name        String
+  slug        String   @unique
+  address     String?
+  city        String
+  state       String
+  country     String   @default("United States")
+  latitude    Float?
+  longitude   Float?
+  phone       String?
+  website     String?
+  priceRange  String?
+  accessType  String?
+  walkable    Boolean?
+  numberOfHoles   Int?
+  photoUrl        String?
+  description     String?
+  writtenSummary  String?
+  localsPickScore Float?
+  metaDescription String?
+  claimed     Boolean  @default(false)
+  featured    Boolean  @default(false)
+  claimedAt   DateTime?
+  stripeId    String?
+  wanderApproved    Boolean  @default(false)
+  wanderApprovedAt  DateTime?
+  communityRating   Float?
+  totalPlayedIt     Int      @default(0)
+  courses     Course[]
+  playedIts   PlayedIt[]
+  reviews     CourseReview[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id            String   @id @default(cuid())
+  clubId        String
+  club          Club     @relation(fields: [clubId], references: [id])
+  name          String
+  numberOfHoles Int      @default(18)
+  parTotal      Int?
+  tees          Tee[]
+  createdAt     DateTime @default(now())
+}
+
+model Tee {
+  id                String  @id @default(cuid())
+  courseId          String
+  course            Course  @relation(fields: [courseId], references: [id])
+  gender            String
+  teeName           String
+  courseRating      Float?
+  slopeRating       Int?
+  bogeyRating       Float?
+  totalYards        Int?
+  totalMeters       Int?
+  parTotal          Int?
+  frontCourseRating Float?
+  frontSlopeRating  Int?
+  backCourseRating  Float?
+  backSlopeRating   Int?
+  holes             Hole[]
+}
+
+model Hole {
+  id         String @id @default(cuid())
+  teeId      String
+  tee        Tee    @relation(fields: [teeId], references: [id])
+  holeNumber Int
+  par        Int
+  yardage    Int
+  handicap   Int?
+}
+
+model TripItinerary {
+  id          String   @id @default(cuid())
+  sessionId   String
+  userId      String?
+  destination String
+  days        Int
+  budget      String?
+  handicap    String?
+  courses     String
+  createdAt   DateTime @default(now())
+}
+
+model PlayedIt {
+  id          String   @id @default(cuid())
+  clubId      String
+  club        Club     @relation(fields: [clubId], references: [id])
+  sessionId   String
+  userId      String?
+  playedOn    DateTime?
+  paceOfPlay  String?
+  worthPrice  String?
+  overallRating Int?
+  wouldReturn Boolean?
+  createdAt   DateTime @default(now())
+}
+
+model CourseReview {
+  id          String   @id @default(cuid())
+  clubId      String
+  club        Club     @relation(fields: [clubId], references: [id])
+  sessionId   String
+  userId      String?
+  rating      Int
+  reviewText  String?
+  playedOn    DateTime?
+  createdAt   DateTime @default(now())
+}

@@ -1,65 +1,157 @@
-import Image from "next/image";
+const intents = [
+  { number: "01", text: "Find my next round" },
+  { number: "02", text: "I'm planning a golf trip" },
+  { number: "03", text: "I want to find courses worth traveling for" },
+  { number: "04", text: "Show me something I've never heard of" },
+]
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
+      {/* Left Panel - Image */}
+      <div
+        className="hidden md:block"
+        style={{ flex: '0 0 60%', position: 'relative' }}
+      >
+        <img
+          src="/images/hero-homepage.png"
+          alt="Golf course aerial view"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+      </div>
+
+      {/* Right Panel - Content */}
+      <div
+        style={{
+          flex: '0 0 40%',
+          background: '#f8f5ef',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '40px 32px',
+        }}
+        className="md:px-16 md:py-0"
+      >
+        {/* Eyebrow */}
+        <p
+          style={{
+            fontSize: '10px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.2em',
+            color: 'rgba(26, 58, 42, 0.45)',
+            marginBottom: '24px',
+          }}
+        >
+          Golf Course Guide
+        </p>
+
+        {/* Headline */}
+        <h1
+          className="font-[family-name:var(--font-serif)]"
+          style={{
+            fontSize: '32px',
+            fontWeight: 400,
+            color: '#1a3a2a',
+            lineHeight: 1.25,
+            marginBottom: '16px',
+          }}
+        >
+          Where are you playing next?
+        </h1>
+
+        {/* Subhead */}
+        <p
+          className="font-[family-name:var(--font-sans)]"
+          style={{
+            fontSize: '14px',
+            fontWeight: 300,
+            color: 'rgba(26, 58, 42, 0.55)',
+            marginBottom: '28px',
+          }}
+        >
+          Every course. Everywhere.
+        </p>
+
+        {/* Divider */}
+        <div
+          style={{
+            width: '100%',
+            height: '1px',
+            background: 'rgba(26, 58, 42, 0.12)',
+            marginBottom: '32px',
+          }}
+        />
+
+        {/* Intent List */}
+        <div>
+          {intents.map((intent) => (
+            <button
+              key={intent.number}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '14px 0',
+                borderBottom: '1px solid rgba(26, 58, 42, 0.08)',
+                cursor: 'pointer',
+                background: 'transparent',
+                border: 'none',
+                borderBottomStyle: 'solid',
+                borderBottomWidth: '1px',
+                borderBottomColor: 'rgba(26, 58, 42, 0.08)',
+                transition: 'background-color 200ms',
+              }}
+              className="hover:bg-[#c9a84c]/[0.06]"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    letterSpacing: '0.15em',
+                    color: '#c9a84c',
+                    marginRight: '16px',
+                  }}
+                >
+                  {intent.number}
+                </span>
+                <span
+                  className="font-[family-name:var(--font-sans)]"
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: '#1a3a2a',
+                    textAlign: 'left',
+                  }}
+                >
+                  {intent.text}
+                </span>
+              </div>
+              <span style={{ fontSize: '14px', color: '#c9a84c' }}>→</span>
+            </button>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+
+        {/* Bottom Stat */}
+        <p
+          style={{
+            marginTop: '32px',
+            fontSize: '10px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.15em',
+            color: 'rgba(26, 58, 42, 0.35)',
+          }}
+        >
+          30,000 courses · All 50 states
+        </p>
+      </div>
+    </main>
+  )
 }
