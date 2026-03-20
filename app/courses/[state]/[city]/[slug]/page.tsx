@@ -87,10 +87,14 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
   const primaryTee = maleTees[0]
 
   // Calculate stats from primary tee
+  const holes = primaryCourse?.numberOfHoles || 18
   const par = primaryCourse?.parTotal || primaryTee?.parTotal || 72
   const yardage = primaryTee?.totalYards || 0
   const slope = primaryTee?.slopeRating || 0
   const rating = primaryTee?.courseRating || 0
+
+  // Check for locals pick (score > 4)
+  const isLocalsPick = club.localsPickScore && club.localsPickScore > 4
 
   // JSON-LD structured data for SEO
   const jsonLd = {
@@ -121,128 +125,146 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* 1. Hero */}
-      <header className="relative text-white" style={{ height: '400px' }}>
-        {/* Background Image */}
+
+      {/* HERO */}
+      <header className="relative h-[400px]">
         <img
           src={club.photoUrl || '/images/hero-morning.png'}
           alt={`${club.name} golf course`}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-          }}
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        {/* Dark Overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'rgba(26, 58, 42, 0.55)',
-          }}
-        />
-        {/* Content */}
-        <div
-          style={{
-            position: 'relative',
-            height: '100%',
-            maxWidth: '72rem',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            paddingLeft: '1rem',
-            paddingRight: '1rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            paddingBottom: '40px',
-          }}
-        >
-          <nav style={{ paddingTop: '20px', marginBottom: '16px' }} className="text-sm">
-            <Link href="/" className="hover:underline">Home</Link>
+        <div className="absolute inset-0" style={{ background: 'rgba(26, 58, 42, 0.55)' }} />
+
+        {/* Wander Approved medallion */}
+        {club.wanderApproved && (
+          <div className="absolute top-6 right-6 bg-[#c9a84c] text-[#1a3a2a] px-4 py-2 text-xs font-semibold uppercase tracking-wide">
+            Wander Approved
+          </div>
+        )}
+
+        <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-between">
+          {/* Breadcrumb at top */}
+          <nav className="pt-6 text-sm text-white/60">
+            <Link href="/" className="hover:text-white/80">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/courses" className="hover:underline">Courses</Link>
+            <Link href="/courses" className="hover:text-white/80">Courses</Link>
             <span className="mx-2">/</span>
-            <Link href={`/courses/${state}`} className="hover:underline">{stateName}</Link>
+            <Link href={`/courses/${state}`} className="hover:text-white/80">{stateName}</Link>
             <span className="mx-2">/</span>
-            <Link href={`/courses/${state}/${city}`} className="hover:underline">{cityName}</Link>
+            <Link href={`/courses/${state}/${city}`} className="hover:text-white/80">{cityName}</Link>
           </nav>
 
-          <div className="flex items-end justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-[family-name:var(--font-serif)] font-normal">
+          {/* Bottom-aligned content */}
+          <div className="pb-10">
+            <div className="flex items-center gap-3">
+              <h1 className="font-[family-name:var(--font-serif)] text-5xl font-normal text-white">
                 {club.name}
               </h1>
-              <p className="text-xl mt-2 text-white/80">
-                {club.city}, {club.state}
-              </p>
+              {isLocalsPick && (
+                <span className="bg-[#c9a84c] text-[#1a3a2a] px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                  Locals Pick
+                </span>
+              )}
             </div>
-            {club.localsPickScore && club.localsPickScore > 4 && (
-              <div className="bg-[#c9a84c] text-[#1a3a2a] px-4 py-2 rounded-full font-semibold text-sm">
-                Locals Pick
-              </div>
-            )}
+            <p className="text-base text-white/70 mt-2">
+              {club.city}, {club.state}
+            </p>
           </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto py-12 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* 2. At a Glance */}
-            <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-              <h2 className="text-xl font-[family-name:var(--font-serif)] font-normal text-[#1a3a2a] mb-4">
-                At a Glance
-              </h2>
-              <div className="grid grid-cols-4 md:grid-cols-8 gap-4 text-center">
-                <Stat label="Holes" value={(primaryCourse?.numberOfHoles || 18).toString()} />
-                <Stat label="Par" value={par.toString()} />
-                <Stat label="Yardage" value={yardage ? yardage.toLocaleString() : '—'} />
-                <Stat label="Slope" value={slope ? slope.toString() : '—'} />
-                <Stat label="Rating" value={rating ? rating.toFixed(1) : '—'} />
-                <Stat label="Price" value={club.priceRange || '—'} />
-                <Stat label="Walkable" value={club.walkable === true ? 'Yes' : club.walkable === false ? 'No' : '—'} />
-                <Stat label="Access" value={club.accessType || '—'} />
-              </div>
-            </section>
+      {/* TODO: Photo gallery renders when club.photos array has > 1 item */}
+      {/* Photos uploaded via claimed listing flow */}
 
-            {/* 3. Editorial Write-up */}
-            <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-              <h2 className="text-xl font-[family-name:var(--font-serif)] font-normal text-[#1a3a2a] mb-4">
+      {/* QUICK STATS BAR */}
+      <div className="bg-[#1a3a2a] py-6">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-center items-center gap-0">
+            <QuickStat label="Holes" value={holes.toString()} />
+            <StatDivider />
+            <QuickStat label="Par" value={par.toString()} />
+            <StatDivider />
+            <QuickStat label="Yardage" value={yardage ? yardage.toLocaleString() : '—'} />
+            <StatDivider />
+            <QuickStat label="Slope" value={slope ? slope.toString() : '—'} />
+            <StatDivider />
+            <QuickStat label="Rating" value={rating ? rating.toFixed(1) : '—'} />
+            <StatDivider />
+            <QuickStat label="Access" value={club.accessType || '—'} />
+          </div>
+        </div>
+      </div>
+
+      {/* TWO COLUMN LAYOUT */}
+      <div className="max-w-[1200px] mx-auto py-12 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
+          {/* LEFT COLUMN */}
+          <div className="space-y-8">
+            {/* Editorial Section */}
+            <section>
+              <h2 className="font-[family-name:var(--font-serif)] text-2xl font-normal text-[#1a3a2a] mb-6">
                 About This Course
               </h2>
-              <div className="prose text-[#1a3a2a]/80">
+              <div className="text-[#1a3a2a]/80 leading-relaxed">
                 {club.writtenSummary ? (
                   <p>{club.writtenSummary}</p>
                 ) : club.description ? (
                   <p>{club.description}</p>
                 ) : (
-                  <p className="text-[#1a3a2a]/50 italic">
+                  <p className="italic text-[#1a3a2a]/50">
                     Editorial write-up coming soon.
                   </p>
                 )}
               </div>
             </section>
 
-            {/* 4. Tee Sheet */}
-            <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-              <h2 className="text-xl font-[family-name:var(--font-serif)] font-normal text-[#1a3a2a] mb-4">
+            {/* Community Section */}
+            <section>
+              <h2 className="font-[family-name:var(--font-serif)] text-2xl font-normal text-[#1a3a2a] mb-6">
+                What Golfers Say
+              </h2>
+              <p className="text-[#1a3a2a]/70 mb-4">
+                {club.totalPlayedIt > 0
+                  ? `${club.totalPlayedIt} golfer${club.totalPlayedIt === 1 ? ' has' : 's have'} played this course`
+                  : 'Be the first to review this course'}
+              </p>
+              <div className="flex gap-3">
+                <CommunityPill label="Pace of Play" value="—" />
+                <CommunityPill label="Worth the Price" value="—" />
+                <CommunityPill label="Would Return" value="—" />
+              </div>
+            </section>
+
+            {/* Greens Report Section */}
+            <section>
+              <h2 className="font-[family-name:var(--font-serif)] text-2xl font-normal text-[#1a3a2a] mb-6">
+                Greens Report
+              </h2>
+              {/* TODO: Query GreensReport model when implemented */}
+              <p className="text-[#1a3a2a]/60 mb-4">
+                No recent reports — be the first
+              </p>
+              <button className="px-4 py-2 text-sm border border-[#1a3a2a] text-[#1a3a2a] hover:bg-[#1a3a2a]/5 transition-colors">
+                Report Current Conditions
+              </button>
+            </section>
+
+            {/* Tee Sheet Section */}
+            <section>
+              <h2 className="font-[family-name:var(--font-serif)] text-2xl font-normal text-[#1a3a2a] mb-6">
                 Tee Sheet
               </h2>
               {maleTees.length > 0 || femaleTees.length > 0 ? (
                 <div className="space-y-6">
                   {maleTees.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-semibold text-[#1a3a2a]/60 mb-2">Men&apos;s Tees</h3>
+                      <h3 className="text-sm font-semibold text-[#1a3a2a]/60 mb-3">Men&apos;s Tees</h3>
                       <TeeTable tees={maleTees} />
                     </div>
                   )}
                   {femaleTees.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-semibold text-[#1a3a2a]/60 mb-2">Women&apos;s Tees</h3>
+                      <h3 className="text-sm font-semibold text-[#1a3a2a]/60 mb-3">Women&apos;s Tees</h3>
                       <TeeTable tees={femaleTees} />
                     </div>
                   )}
@@ -251,38 +273,49 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
                 <p className="text-[#1a3a2a]/50 italic">Tee information not available.</p>
               )}
             </section>
-
-            {/* 5. Greens Report */}
-            <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-              <h2 className="text-xl font-[family-name:var(--font-serif)] font-normal text-[#1a3a2a] mb-4">
-                Greens Report
-              </h2>
-              <p className="text-[#1a3a2a]/60">
-                No recent reports. Have you played here recently?
-              </p>
-            </section>
           </div>
 
-          {/* Sidebar */}
+          {/* RIGHT SIDEBAR */}
           <div className="space-y-6">
-            {/* 6. Actions */}
-            <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-              <div className="space-y-3">
-                <button className="w-full py-3 bg-[#1a3a2a] text-white rounded-lg font-semibold hover:bg-[#1a3a2a]/90 transition-colors">
-                  Book Tee Time
-                </button>
-                <button className="w-full py-3 bg-[#c9a84c] text-[#1a3a2a] rounded-lg font-semibold hover:bg-[#c9a84c]/90 transition-colors">
-                  Played It
-                </button>
-                <button className="w-full py-3 border border-[#1a3a2a]/20 text-[#1a3a2a] rounded-lg font-semibold hover:bg-[#1a3a2a]/5 transition-colors">
-                  Save to List
-                </button>
-              </div>
-            </section>
+            {/* Actions */}
+            <div className="space-y-0">
+              <button className="w-full py-3 bg-[#1a3a2a] text-white text-sm font-medium hover:bg-[#1a3a2a]/90 transition-colors">
+                Book Tee Time
+              </button>
+              <button className="w-full py-3 bg-[#c9a84c] text-[#1a3a2a] text-sm font-medium hover:bg-[#c9a84c]/90 transition-colors">
+                Played It ✓
+              </button>
+              <button className="w-full py-3 border border-[#1a3a2a]/30 text-[#1a3a2a] text-sm hover:bg-[#1a3a2a]/5 transition-colors">
+                Save to List
+              </button>
+              <Link
+                href="#"
+                className="block text-sm text-[#c9a84c] text-center mt-2 cursor-pointer hover:underline"
+              >
+                Find courses like this →
+              </Link>
+            </div>
 
-            {/* Contact Info */}
-            <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-              <h3 className="font-semibold text-[#1a3a2a] mb-3">Contact</h3>
+            {/* At a Glance Card */}
+            <div className="bg-white border border-[#1a3a2a]/10 p-6">
+              <h3 className="font-[family-name:var(--font-serif)] text-lg font-normal text-[#1a3a2a] mb-4">
+                At a Glance
+              </h3>
+              <div className="space-y-0">
+                <GlanceRow label="Designer" value="—" />
+                <GlanceRow label="Year Est." value="—" />
+                <GlanceRow label="Course Style" value="—" />
+                <GlanceRow label="Walkable" value={club.walkable === true ? 'Yes' : club.walkable === false ? 'No' : '—'} />
+                <GlanceRow label="Price Range" value={club.priceRange || '—'} />
+                <GlanceRow label="Access Type" value={club.accessType || '—'} isLast />
+              </div>
+            </div>
+
+            {/* Contact Card */}
+            <div className="bg-white border border-[#1a3a2a]/10 p-6">
+              <h3 className="font-[family-name:var(--font-serif)] text-lg font-normal text-[#1a3a2a] mb-4">
+                Contact
+              </h3>
               <div className="space-y-2 text-sm text-[#1a3a2a]/70">
                 {club.address && <p>{club.address}</p>}
                 <p>{club.city}, {club.state}</p>
@@ -294,28 +327,44 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
                     rel="noopener noreferrer"
                     className="text-[#1a3a2a] hover:underline block"
                   >
-                    Website
+                    Website →
                   </a>
                 )}
               </div>
-            </section>
+              {!club.claimed && (
+                <Link
+                  href="#"
+                  className="text-xs text-[#c9a84c] mt-4 block hover:underline"
+                >
+                  Is this your course? Claim this listing →
+                </Link>
+              )}
+            </div>
 
-            {/* 7. Nearby Courses */}
+            {/* Nearby Courses Card */}
             {nearbyCourses.length > 0 && (
-              <section className="bg-white p-6 rounded-lg border border-[#1a3a2a]/10">
-                <h3 className="font-semibold text-[#1a3a2a] mb-3">Nearby Courses</h3>
-                <div className="space-y-3">
-                  {nearbyCourses.map((nearby) => (
+              <div className="bg-white border border-[#1a3a2a]/10 p-6">
+                <h3 className="font-[family-name:var(--font-serif)] text-lg font-normal text-[#1a3a2a] mb-4">
+                  Nearby Courses
+                </h3>
+                <div className="space-y-0">
+                  {nearbyCourses.map((nearby, index) => (
                     <Link
                       key={nearby.slug}
                       href={`/courses/${state}/${city}/${nearby.slug}`}
-                      className="flex justify-between items-center py-2 border-b border-[#1a3a2a]/5 last:border-0 hover:text-[#c9a84c] transition-colors"
+                      className={`flex justify-between items-center py-3 ${
+                        index < nearbyCourses.length - 1 ? 'border-b border-[#1a3a2a]/10' : ''
+                      } hover:text-[#c9a84c] transition-colors group`}
                     >
-                      <span className="text-sm text-[#1a3a2a]">{nearby.name}</span>
+                      <div>
+                        <span className="text-sm text-[#1a3a2a] group-hover:text-[#c9a84c]">{nearby.name}</span>
+                        <span className="text-xs text-[#1a3a2a]/50 block">{nearby.city}</span>
+                      </div>
+                      <span className="text-[#c9a84c]">→</span>
                     </Link>
                   ))}
                 </div>
-              </section>
+              </div>
             )}
           </div>
         </div>
@@ -324,11 +373,34 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function QuickStat({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <div className="text-lg font-semibold text-[#1a3a2a]">{value}</div>
-      <div className="text-xs text-[#1a3a2a]/60">{label}</div>
+    <div className="text-center px-6">
+      <div className="text-white text-lg font-semibold">{value}</div>
+      <div className="text-white/50 text-xs mt-1">{label}</div>
+    </div>
+  )
+}
+
+function StatDivider() {
+  return <div className="h-10 w-px bg-white/20" />
+}
+
+function CommunityPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-[#f8f5ef] px-4 py-2 text-center">
+      <div className="text-sm text-[#1a3a2a]/60 font-medium">{value}</div>
+      <div className="text-xs text-[#1a3a2a]/40 mt-1">{label}</div>
+    </div>
+  )
+}
+
+function GlanceRow({ label, value, isLast = false }: { label: string; value: string; isLast?: boolean }) {
+  if (value === '—') return null
+  return (
+    <div className={`flex justify-between items-center py-3 ${!isLast ? 'border-b border-[#1a3a2a]/10' : ''}`}>
+      <span className="text-sm text-[#1a3a2a]/60">{label}</span>
+      <span className="text-sm text-[#1a3a2a] font-medium">{value}</span>
     </div>
   )
 }
@@ -348,27 +420,27 @@ function TeeTable({ tees }: { tees: TeeData[] }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-[#1a3a2a]/10">
-            <th className="text-left py-2 text-[#1a3a2a]/60">Tee</th>
-            <th className="text-right py-2 text-[#1a3a2a]/60">Yards</th>
-            <th className="text-right py-2 text-[#1a3a2a]/60">Par</th>
-            <th className="text-right py-2 text-[#1a3a2a]/60">Rating</th>
-            <th className="text-right py-2 text-[#1a3a2a]/60">Slope</th>
+            <th className="text-left py-2 text-[#1a3a2a]/60 font-medium">Tee</th>
+            <th className="text-right py-2 text-[#1a3a2a]/60 font-medium">Yards</th>
+            <th className="text-right py-2 text-[#1a3a2a]/60 font-medium">Par</th>
+            <th className="text-right py-2 text-[#1a3a2a]/60 font-medium">Rating</th>
+            <th className="text-right py-2 text-[#1a3a2a]/60 font-medium">Slope</th>
           </tr>
         </thead>
         <tbody>
           {tees.map((tee) => (
-            <tr key={tee.id} className="border-b border-[#1a3a2a]/5">
-              <td className="py-2 font-medium text-[#1a3a2a]">{tee.teeName}</td>
-              <td className="py-2 text-right text-[#1a3a2a]/70">
+            <tr key={tee.id} className="border-b border-[#1a3a2a]/10">
+              <td className="py-3 font-medium text-[#1a3a2a]">{tee.teeName}</td>
+              <td className="py-3 text-right text-[#1a3a2a]/70">
                 {tee.totalYards?.toLocaleString() || '—'}
               </td>
-              <td className="py-2 text-right text-[#1a3a2a]/70">
+              <td className="py-3 text-right text-[#1a3a2a]/70">
                 {tee.parTotal || '—'}
               </td>
-              <td className="py-2 text-right text-[#1a3a2a]/70">
+              <td className="py-3 text-right text-[#1a3a2a]/70">
                 {tee.courseRating?.toFixed(1) || '—'}
               </td>
-              <td className="py-2 text-right text-[#1a3a2a]/70">
+              <td className="py-3 text-right text-[#1a3a2a]/70">
                 {tee.slopeRating || '—'}
               </td>
             </tr>
