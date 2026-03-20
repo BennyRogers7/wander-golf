@@ -117,3 +117,9 @@ greens recently punched
 - Build script: prisma generate && next build
 - Neon connection string in .env
 - Always read this file at start of every Claude Code session
+
+## Next Steps
+- Enrichment script created: `npm run enrich`
+- Run after bulk ingest completes
+- Fetches full tee data via /v1/courses/{id} endpoint
+- Current ingest count: 1,500+ and running
