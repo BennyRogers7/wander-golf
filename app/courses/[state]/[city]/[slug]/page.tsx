@@ -156,8 +156,8 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
 
           {/* Bottom-aligned content */}
           <div className="pb-10">
-            <div className="flex items-center gap-3">
-              <h1 className="font-[family-name:var(--font-serif)] text-5xl font-normal text-white">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-[family-name:var(--font-serif)] text-[32px] md:text-5xl font-normal text-white">
                 {club.name}
               </h1>
               {isLocalsPick && (
@@ -177,29 +177,41 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
       {/* Photos uploaded via claimed listing flow */}
 
       {/* QUICK STATS BAR */}
-      <div className="bg-[#1a3a2a] py-6">
+      <div className="bg-[#1a3a2a] py-4 md:py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-center items-center gap-0">
+          <div className="grid grid-cols-3 md:flex md:justify-center md:items-center gap-y-4 md:gap-0">
             <QuickStat label="Holes" value={holes.toString()} />
-            <StatDivider />
+            <StatDivider className="hidden md:block" />
             <QuickStat label="Par" value={par.toString()} />
-            <StatDivider />
+            <StatDivider className="hidden md:block" />
             <QuickStat label="Yardage" value={yardage ? yardage.toLocaleString() : '—'} />
-            <StatDivider />
+            <StatDivider className="hidden md:block" />
             <QuickStat label="Slope" value={slope ? slope.toString() : '—'} />
-            <StatDivider />
+            <StatDivider className="hidden md:block" />
             <QuickStat label="Rating" value={rating ? rating.toFixed(1) : '—'} />
-            <StatDivider />
+            <StatDivider className="hidden md:block" />
             <QuickStat label="Access" value={club.accessType || '—'} />
           </div>
         </div>
       </div>
 
+      {/* MOBILE ACTION BUTTONS - Fixed at bottom on mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f8f5ef] border-t border-[#1a3a2a]/10 p-4 z-50">
+        <div className="flex gap-3">
+          <button className="flex-1 py-3 bg-[#1a3a2a] text-white text-sm font-medium">
+            Book Tee Time
+          </button>
+          <button className="flex-1 py-3 bg-[#c9a84c] text-[#1a3a2a] text-sm font-medium">
+            Played It ✓
+          </button>
+        </div>
+      </div>
+
       {/* TWO COLUMN LAYOUT */}
-      <div className="max-w-[1200px] mx-auto py-12 px-4">
+      <div className="max-w-[1200px] mx-auto py-8 md:py-12 px-4 pb-28 md:pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
-          {/* LEFT COLUMN */}
-          <div className="space-y-8">
+          {/* LEFT COLUMN - Main content */}
+          <div className="space-y-8 order-1">
             {/* Editorial Section */}
             <section>
               <h2 className="font-[family-name:var(--font-serif)] text-2xl font-normal text-[#1a3a2a] mb-6">
@@ -276,9 +288,9 @@ export default async function CourseProfilePage({ params }: CoursePageProps) {
           </div>
 
           {/* RIGHT SIDEBAR */}
-          <div className="space-y-6">
-            {/* Actions */}
-            <div className="space-y-0">
+          <div className="space-y-6 order-2">
+            {/* Actions - Hidden on mobile since we have fixed bottom bar */}
+            <div className="hidden md:block space-y-0">
               <button className="w-full py-3 bg-[#1a3a2a] text-white text-sm font-medium hover:bg-[#1a3a2a]/90 transition-colors">
                 Book Tee Time
               </button>
@@ -382,8 +394,8 @@ function QuickStat({ label, value }: { label: string; value: string }) {
   )
 }
 
-function StatDivider() {
-  return <div className="h-10 w-px bg-white/20" />
+function StatDivider({ className = '' }: { className?: string }) {
+  return <div className={`h-10 w-px bg-white/20 ${className}`} />
 }
 
 function CommunityPill({ label, value }: { label: string; value: string }) {

@@ -9,87 +9,35 @@ const intents = [
 
 export default function HomePage() {
   return (
-    <main style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
-      {/* Left Panel - Image */}
-      <div
-        className="hidden md:block"
-        style={{ flex: '0 0 60%', position: 'relative' }}
-      >
+    <main className="flex flex-1 flex-col md:flex-row">
+      {/* Image Panel - Top on mobile, Left on desktop */}
+      <div className="relative h-[50vh] w-full md:h-auto md:flex-[0_0_60%]">
         <img
           src="/images/hero-homepage.png"
           alt="Golf course aerial view"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-          }}
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
       </div>
 
-      {/* Right Panel - Content */}
-      <div
-        style={{
-          flex: '0 0 40%',
-          background: '#f8f5ef',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: '40px 32px',
-        }}
-        className="md:px-16 md:py-0"
-      >
+      {/* Content Panel */}
+      <div className="flex-[0_0_40%] bg-[#f8f5ef] flex flex-col justify-center px-6 py-10 md:px-16 md:py-0">
         {/* Eyebrow */}
-        <p
-          style={{
-            fontSize: '10px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.2em',
-            color: 'rgba(26, 58, 42, 0.45)',
-            marginBottom: '24px',
-          }}
-        >
+        <p className="text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] text-[#1a3a2a]/45 mb-6 whitespace-nowrap">
           Golf Course Guide
         </p>
 
         {/* Headline */}
-        <h1
-          className="font-[family-name:var(--font-serif)]"
-          style={{
-            fontSize: '32px',
-            fontWeight: 400,
-            color: '#1a3a2a',
-            lineHeight: 1.25,
-            marginBottom: '16px',
-          }}
-        >
+        <h1 className="font-[family-name:var(--font-serif)] text-[28px] md:text-[36px] font-normal text-[#1a3a2a] leading-[1.25] mb-4">
           Where are you playing next?
         </h1>
 
         {/* Subhead */}
-        <p
-          className="font-[family-name:var(--font-sans)]"
-          style={{
-            fontSize: '14px',
-            fontWeight: 300,
-            color: 'rgba(26, 58, 42, 0.55)',
-            marginBottom: '28px',
-          }}
-        >
+        <p className="font-[family-name:var(--font-sans)] text-[13px] md:text-[14px] font-light text-[#1a3a2a]/55 mb-7">
           Every course. Everywhere.
         </p>
 
         {/* Divider */}
-        <div
-          style={{
-            width: '100%',
-            height: '1px',
-            background: 'rgba(26, 58, 42, 0.12)',
-            marginBottom: '32px',
-          }}
-        />
+        <div className="w-full h-px bg-[#1a3a2a]/12 mb-6 md:mb-8" />
 
         {/* Intent List */}
         <div>
@@ -97,58 +45,23 @@ export default function HomePage() {
             <Link
               key={intent.number}
               href={intent.href}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '14px 0',
-                borderBottom: '1px solid rgba(26, 58, 42, 0.08)',
-                cursor: 'pointer',
-                background: 'transparent',
-                textDecoration: 'none',
-                transition: 'background-color 200ms',
-              }}
-              className="hover:bg-[#c9a84c]/[0.06]"
+              className="w-full flex items-center justify-between py-3 md:py-[14px] border-b border-[#1a3a2a]/8 hover:bg-[#c9a84c]/[0.06] transition-colors"
             >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span
-                  style={{
-                    fontSize: '10px',
-                    letterSpacing: '0.15em',
-                    color: '#c9a84c',
-                    marginRight: '16px',
-                  }}
-                >
+              <div className="flex items-center whitespace-nowrap">
+                <span className="text-[10px] tracking-[0.15em] text-[#c9a84c] mr-2 md:mr-4">
                   {intent.number}
                 </span>
-                <span
-                  className="font-[family-name:var(--font-sans)]"
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: 400,
-                    color: '#1a3a2a',
-                    textAlign: 'left',
-                  }}
-                >
+                <span className="font-[family-name:var(--font-sans)] text-[13px] md:text-[14px] font-normal text-[#1a3a2a]">
                   {intent.text}
                 </span>
               </div>
-              <span style={{ fontSize: '14px', color: '#c9a84c' }}>→</span>
+              <span className="text-[14px] text-[#c9a84c] ml-2">→</span>
             </Link>
           ))}
         </div>
 
         {/* Bottom Stat */}
-        <p
-          style={{
-            marginTop: '32px',
-            fontSize: '10px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.15em',
-            color: 'rgba(26, 58, 42, 0.35)',
-          }}
-        >
+        <p className="mt-6 md:mt-8 text-[10px] uppercase tracking-[0.15em] text-[#1a3a2a]/35">
           30,000 courses · All 50 states
         </p>
       </div>
