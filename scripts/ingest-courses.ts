@@ -74,10 +74,13 @@ interface ApiCourse {
 
 interface ApiSearchResponse {
   courses: ApiCourse[]
-  total: number
-  page: number
-  per_page: number
-  total_pages: number
+  metadata: {
+    current_page: number
+    page_size: number
+    first_page: number
+    last_page: number
+    total_records: number
+  }
 }
 
 interface SessionStats {
@@ -87,8 +90,10 @@ interface SessionStats {
   perPage: number
 }
 
-function createSlug(name: string, city: string): string {
-  return slugify(`${name} ${city}`, { lower: true, strict: true })
+function createSlug(name: string, city: string, apiId: number): string {
+  const baseSlug = slugify(`${name} ${city}`, { lower: true, strict: true })
+  // Append apiId to ensure uniqueness
+  return `${baseSlug}-${apiId}`
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -155,7 +160,7 @@ async function getDbCounts(): Promise<{ clubs: number; courses: number; tees: nu
 }
 
 async function fetchPage(page: number, retries = 3): Promise<ApiSearchResponse> {
-  const url = `${BASE_URL}/search?search_query=golf&page=${page}`
+  const url = `${BASE_URL}/courses?page=${page}`
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     const response = await fetch(url, {
@@ -191,7 +196,7 @@ async function fetchPage(page: number, retries = 3): Promise<ApiSearchResponse> 
 }
 
 async function upsertClub(apiCourse: ApiCourse): Promise<string> {
-  const slug = createSlug(apiCourse.club_name, apiCourse.location.city)
+  const slug = createSlug(apiCourse.club_name, apiCourse.location.city, apiCourse.id)
 
   const club = await prisma.club.upsert({
     where: { apiId: apiCourse.id },
@@ -318,17 +323,32 @@ async function upsertHolesBatch(teeId: string, apiHoles: ApiHole[]): Promise<voi
     where: { teeId },
   })
 
-  const holesData = apiHoles.map((hole, index) => ({
+  // Filter out holes with missing or invalid required fields
+  const validHoles = apiHoles.filter(hole =>
+    typeof hole.par === 'number' &&
+    typeof hole.yardage === 'number' &&
+    !isNaN(hole.par) &&
+    !isNaN(hole.yardage)
+  )
+
+  if (validHoles.length === 0) return
+
+  const holesData = validHoles.map((hole, index) => ({
     teeId,
     holeNumber: index + 1,
-    par: hole.par,
-    yardage: hole.yardage,
-    handicap: hole.handicap ?? null,
+    par: Math.round(hole.par),
+    yardage: Math.round(hole.yardage),
+    handicap: typeof hole.handicap === 'number' ? hole.handicap : null,
   }))
 
-  await prisma.hole.createMany({
-    data: holesData,
-  })
+  try {
+    await prisma.hole.createMany({
+      data: holesData,
+    })
+  } catch (error) {
+    // Log but don't crash - some tees may have bad data
+    console.error(`⚠️ Failed to insert holes for tee ${teeId}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
 }
 
 async function processTees(courseId: string, tees: ApiTeeSet): Promise<void> {
@@ -402,9 +422,9 @@ async function main(): Promise<void> {
 
       // Update stats from first response
       if (stats.totalPages === null) {
-        stats.totalPages = response.total_pages || null
-        stats.perPage = response.per_page || 25
-        console.log(`📡 API reports ${response.total?.toLocaleString() || 'unknown'} total courses across ${stats.totalPages || 'unknown'} pages\n`)
+        stats.totalPages = response.metadata?.last_page || null
+        stats.perPage = response.metadata?.page_size || 20
+        console.log(`📡 Total courses: ${response.metadata?.total_records?.toLocaleString() || 'unknown'} across ${stats.totalPages || 'unknown'} pages\n`)
       }
 
       if (!courses || courses.length === 0) {
@@ -425,8 +445,13 @@ async function main(): Promise<void> {
           console.log('\n')
         }
 
-        await processApiCourse(apiCourse)
-        stats.clubsThisSession++
+        try {
+          await processApiCourse(apiCourse)
+          stats.clubsThisSession++
+        } catch (error) {
+          console.error(`⚠️ Error processing ${apiCourse.club_name}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+          // Continue with next course instead of crashing
+        }
 
         // Reconnect every RECONNECT_INTERVAL records to prevent connection pool buildup
         if (stats.clubsThisSession % RECONNECT_INTERVAL === 0) {
@@ -445,12 +470,12 @@ async function main(): Promise<void> {
       if (TEST_MODE) {
         console.log('\n🧪 TEST MODE: Stopping after page 1')
         hasMorePages = false
-      } else if (response.total_pages && page >= response.total_pages) {
+      } else if (response.metadata?.current_page >= response.metadata?.last_page) {
         hasMorePages = false
       } else if (page >= END_PAGE) {
         console.log(`\n⏹️ Reached end page limit (${END_PAGE})`)
         hasMorePages = false
-      } else if (!response.courses || response.courses.length < stats.perPage) {
+      } else if (!response.courses || response.courses.length === 0) {
         hasMorePages = false
       } else {
         page++

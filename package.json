@@ -8,9 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "ingest": "node --max-old-space-size=4096 node_modules/.bin/tsx scripts/ingest-courses.ts",
-    "enrich": "node --max-old-space-size=4096 node_modules/.bin/tsx scripts/enrich-courses.ts"
+    "enrich": "node --max-old-space-size=4096 node_modules/.bin/tsx scripts/enrich-courses.ts",
+    "writeups": "node --max-old-space-size=4096 node_modules/.bin/tsx scripts/generate-writeups.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^6.19.2",
     "@stripe/stripe-js": "^8.11.0",
